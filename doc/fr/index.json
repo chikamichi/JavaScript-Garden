@@ -1,0 +1,69 @@
+{
+    "title": "JavaScript Garden",
+    "langTitle": "JavaScript Garden en Français",
+    "description": "Un guide sur les bizarreries et petits défauts de JavaScript.",
+    "sections": [
+        {
+            "title": "Intro",
+            "dir": "intro",
+            "articles": ["index"]
+        },
+        {
+            "title": "Objets",
+            "dir": "object",
+            "articles": [
+                "general",
+                "prototype",
+                "hasownproperty",
+                "forinloop"
+            ]
+        },
+        {
+            "title": "Fonctions",
+            "dir": "function",
+            "articles": [
+                "general",
+                "this",
+                "closures",
+                "arguments",
+                "constructors",
+                "scopes"
+            ]
+        },
+        {
+            "title": "Arrays",
+            "dir": "array",
+            "articles": [
+                "general",
+                "constructor"
+            ]
+        },
+        {
+            "title": "Types",
+            "dir": "types",
+            "articles": [
+                "equality",
+                "typeof",
+                "instanceof",
+                "casting"
+            ]
+        },
+        {
+            "title": "Core",
+            "dir": "core",
+            "articles": [
+                "eval",
+                "undefined",
+                "semicolon",
+                "delete"
+            ]
+        },
+        {
+            "title": "Autres",
+            "dir": "other",
+            "articles": [
+                "timeouts"
+            ]
+        }
+    ]
+}
