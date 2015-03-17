@@ -1,66 +1,69 @@
-## Object Usage and Properties
+## Utilisation des objets et de leurs propriétés
 
-Everything in JavaScript acts like an object, with the only two exceptions being 
-[`null`](#core.undefined) and [`undefined`](#core.undefined).
+En JavaScript, tout se comporte comme un objet, avec seulement deux exceptions,
+qui sont [`null`](#core.undefined) et [`undefined`](#core.undefined).
 
     false.toString(); // 'false'
     [1, 2, 3].toString(); // '1,2,3'
-    
+
     function Foo(){}
     Foo.bar = 1;
     Foo.bar; // 1
 
-A common misconception is that number literals cannot be used as
-objects. That is because a flaw in JavaScript's parser tries to parse the *dot 
-notation* on a number as a floating point literal.
+Une erreur fréquente de compréhension concernant la nature du language
+consiste à penser que les nombres ne peuvent pas être utilisés comme des
+objets. Cela vient en fait d'une erreur dans les parseurs JavaScript qui
+tente d'interpréter la *notation point* normalement utilisée avec un objet
+comme une « virgule » d'un nombre flottant.
 
-    2.toString(); // raises SyntaxError
+    2.toString(); // lève une erreur du type SyntaxError
 
-There are a couple of workarounds that can be used to make number literals act
-as objects too.
+Il existe plusieurs façons de contourner ce problème.
 
-    2..toString(); // the second point is correctly recognized
-    2 .toString(); // note the space left to the dot
-    (2).toString(); // 2 is evaluated first
+    2..toString(); // le deuxième point est correctement parsé
+    2 .toString(); // en utilisant un espace avant le point
+    (2).toString(); // 2 sera évalué en premier, puis le point
 
-### Objects as a Data Type
+### Les objets comme type de données
 
-Objects in JavaScript can also be used as [*Hashmaps*][1]; they mainly consist 
-of named properties mapping to values.
+En JavaScript, les objets peuvent être utilisés comme des systèmes
+[*clé-valeur*][1] ; pour faire simple, on les utilisera fréquement comme des
+collections de propriétés nommées, auxquelles correspondent des valeurs.
 
-Using an object literal - `{}` notation - it is possible to create a 
-plain object. This new object [inherits](#object.prototype) from `Object.prototype` and 
-does not have [own properties](#object.hasownproperty) defined.
+En utilisant la notation littérale pour les objets, `{}`, il est possible de
+créer un objet complet, qui va [hériter](#object.prototype) de `Object.prototype`
+et qui n'aura aucune [propriétés propres](#object.hasownproperty).
 
-    var foo = {}; // a new empty object
+    var foo = {}; // un nouvel objet, vide
 
-    // a new object with a 'test' property with value 12
-    var bar = {test: 12}; 
+    // un nouvel objet avec une propriété "test", de valeur 12
+    var bar = {test: 12};
 
-### Accessing Properties
+### Accès aux propriétés
 
-The properties of an object can be accessed in two ways, via either the dot
-notation or the square bracket notation.
-    
+L'accès aux propriétés d'un objet peut se faire de deux manières : avec la
+notation point, ou avec des crochets.
+
     var foo = {name: 'kitten'}
     foo.name; // kitten
     foo['name']; // kitten
-    
+
     var get = 'name';
     foo[get]; // kitten
-    
-    foo.1234; // SyntaxError
-    foo['1234']; // works
 
-The notations work almost identically, with the only difference being that the
-square bracket notation allows for dynamic setting of properties and
-the use of property names that would otherwise lead to a syntax error.
+    foo.1234; // lève une erreur du type SyntaxError
+    foo['1234']; // fonctionne très bien
 
-### Deleting Properties
+Les deux notations fonctionnent *grosso modo* de la même manière, à ceci près
+que les crochets permettent d'utiliser des noms construits dynamiquement, ce
+qui serait impossible avec la notation point (laquelle lèverait une erreur de
+syntaxe).
 
-The only way to remove a property from an object is to use the `delete`
-operator; setting the property to `undefined` or `null` only removes the
-*value* associated with the property, but not the *key*.
+### Suppression de propriétés
+
+La seule manière de supprimer une propriété d'un objet est d'utiliser
+l'opérateur `delete`. Assigner une valeur `undefined` ou `null` ne fera que
+supprimer la *valeur* de la propriété, et pas sa *clé d'accès* sur l'objet.
 
     var obj = {
         bar: 1,
@@ -77,23 +80,25 @@ operator; setting the property to `undefined` or `null` only removes the
         }
     }
 
-The above outputs both `bar undefined` and `foo null` - only `baz` was
-removed and is therefore missing from the output.
+Le code ci-dessus affiche `bar undefined` et `foo null` — seul `baz` a été
+véritablement supprimé et n'est par conséquent pas affiché.
 
-### Notation of Keys
+### Notation des clés de propriétés
 
     var test = {
-        'case': 'I am a keyword, so I must be notated as a string',
-        delete: 'I am a keyword, so me too' // raises SyntaxError
+        'case': 'Je suis un mot réservé, je dois donc être défini comme une chaîne',
+        delete: 'Je suis également un mot réservé… je devrais aussi' // SyntaxError
     };
 
-Object properties can be both notated as plain characters and as strings. Due to
-another mis-design in JavaScript's parser, the above will throw 
-a `SyntaxError` prior to ECMAScript 5.
+Les propriétés d'un objet peuvent aussi bien être nommées avec des caractères
+« pleins », qu'en utilisant une chaîne de caractères (entre guillemets). Du
+fait de certaines limitations dans le parseur JavaScript avant la version
+ECMAScript 5, la clé `delete` ci-dessus occasionnerai un erreur de syntaxe.
 
-This error arises from the fact that `delete` is a *keyword*; therefore, it must be 
-notated as a *string literal* to ensure that it will be correctly interpreted by
-older JavaScript engines.
+Cette erreur provient du fait que `delete` est un mot-clé réservé du language,
+et s'il est utilisé comme clé d'accès pour une propriété, doit être défini avec
+une chaîne de caractère pour être correctement interprété par les anciens
+moteurs JavaScript.
 
 [1]: http://en.wikipedia.org/wiki/Hashmap
 
