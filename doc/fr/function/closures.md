@@ -1,11 +1,13 @@
-## Closures and References
+## Closures et référenceS
 
-One of JavaScript's most powerful features is the availability of *closures*.
-With closures, scopes **always** keep access to the outer scope, in which they
-were defined. Since the only scoping that JavaScript has is 
-[function scope](#function.scopes), all functions, by default, act as closures.
+Une des fonctionnalités les plus puissantes de JavaScript tient dans la notion
+de *closures* (aussi appelée *clôture* ou *fermeture* en français). Une closure
+a ceci de particulier que son scope a à tout moment accès à son scope parent.
+Mais comme, en JavaScript, la seule manière de créer un nouveau scope est de
+créer une nouvelle [fonction](#function.scopes), ce cas particulier devient le
+cas général : toutes les fonctions, par défaut, se comportent comme des closures.
 
-### Emulating private variables
+### Émuler des variables privées
 
     function Counter(start) {
         var count = start;
@@ -24,69 +26,73 @@ were defined. Since the only scoping that JavaScript has is
     foo.increment();
     foo.get(); // 5
 
-Here, `Counter` returns **two** closures: the function `increment` as well as 
-the function `get`. Both of these functions keep a **reference** to the scope of 
-`Counter` and, therefore, always keep access to the `count` variable that was 
-defined in that scope.
+Dans cet exemple, `counter` retourne **deux** closures : la fonction `increment`
+et la fonction `get`. Ces deux fonctions ont à leur disposition une **référence**
+vers le scope de `Counter`, et par conséquent, peuvent accéder à la variable
+`count` qui a été définie dans ce scope « parent. »
 
-### Why Private Variables Work
+### Explication du mécanisme de variables privées
 
-Since it is not possible to reference or assign scopes in JavaScript, there is 
-**no** way of accessing the variable `count` from the outside. The only way to 
-interact with it is via the two closures.
+Il est impossible en JavaScript de référencer ou d'assigner des scopes. Cela
+explique pourquoi il n'est pas possible d'accèder à la variable `count` depuis
+l'extérieur des fonctions/closures. La seule manière d'y accéder est d'être
+à l'intérieur d'une de ces deux closures.
 
     var foo = new Counter(4);
     foo.hack = function() {
         count = 1337;
     };
 
-The above code will **not** change the variable `count` in the scope of `Counter`, 
-since `foo.hack` was not defined in **that** scope. It will instead create - or 
-override - the *global* variable `count`.
+Le code ci-dessus ne va **pas** modifier la variable `count` qui a initialement
+été définie dans le scope de `Counter`, car `foo.hack` n'a pas elle-même été
+définie dans ce scope. Une nouvelle variable, globale, nommée `count`, sera
+ainsi définie, ou modifiée si elle existait déjà.
 
-### Closures Inside Loops
+### Comportement des closures dans des boucles
 
-One often made mistake is to use closures inside of loops, as if they were
-copying the value of the loop's index variable.
+Une erreur fréquente consiste à supposer qu'une closure à l'intérieur d'une
+boucles va copier la valeur de la variable d'index de la boucle.
 
     for(var i = 0; i < 10; i++) {
         setTimeout(function() {
-            console.log(i);  
+            console.log(i);
         }, 1000);
     }
 
-The above will **not** output the numbers `0` through `9`, but will simply print
-the number `10` ten times.
+Le code ci-dessus ne va **pas** afficher les chiffres `0` à `9` : on verra en
+fait dix fois le chiffre `10`.
 
-The *anonymous* function keeps a **reference** to `i`. At the time 
-`console.log` gets called, the `for loop` has already finished, and the value of 
-`i` has been set to `10`.
+La fonction *anonyme* conserve une **référence** vers `i`, et au moment où
+`console.log` est exécuté, la boucle `for` est déjà terminée, si bien que la
+valeur de `i` est `10`.
 
-In order to get the desired behavior, it is necessary to create a **copy** of 
-the value of `i`.
+Pour arriver à avoir le comportement souhaité, il est nécessaire de créer
+soi-même une **copie** de la valeur de `i`.
 
-### Avoiding the Reference Problem
+### Le problème de référence
 
-In order to copy the value of the loop's index variable, it is best to use an 
-[anonymous wrapper](#function.scopes).
+Pour ce faire (créer une copie explicite de `i`), le mieux consiste à utiliser
+un ["wrapper" anonyme](#function.scopes).
 
     for(var i = 0; i < 10; i++) {
         (function(e) {
             setTimeout(function() {
-                console.log(e);  
+                console.log(e);
             }, 1000);
         })(i);
     }
 
-The anonymous outer function gets called immediately with `i` as its first 
-argument and will receive a copy of the **value** of `i` as its parameter `e`.
+La fonction anonyme « extérieure » (le "wrapper") est appelée immédiatement
+avec comme argument, `i`, de sorte que le paramètre `e` possède sa valeur
+à chaque tour de boucle.
 
-The anonymous function that gets passed to `setTimeout` now has a reference to 
-`e`, whose value does **not** get changed by the loop.
+La fonction anonyme passée à `setTimeout` possède elle une référence à `e`,
+car `e` est défini (en tant qu'argument) dans le scope parent. Cette valeur
+de `e` n'est **pas** modifiée par la boucle.
 
-There is another possible way of achieving this, which is to return a function 
-from the anonymous wrapper that will then have the same behavior as the code 
-above.
+Une autre façon de faire consisterait à retourner une fonction depuis le
+wrapper, fonction ayant le même comportement que le code ci-dessus, et à
+utiliser ce wrapper dans `setTimeout`.
 
     for(var i = 0; i < 10; i++) {
         setTimeout((function(e) {
@@ -96,20 +102,20 @@ above.
         })(i), 1000)
     }
 
-The other popular way to acheive this is to add an additional argument to
-the setTimeout function, which passes these arguments to the callback.
+`setTimeout` a été conçue pour gérer ce cas d'usage en acceptant en fait
+des arguments supplémentaires, qui seront passées à la fonction de callback.
 
     for(var i = 0; i < 10; i++) {
         setTimeout(function(e) {
-            console.log(e);  
+            console.log(e);
         }, 1000, i);
     }
 
-Some legacy JS environments (Internet Explorer 9 & below) do not support this.
+Sachez que certains environnements d'exécution ne supportent pas cette
+fonctionnalité (Internet Explorer 9 et plus anciens.)
 
-There's yet another way to accomplish this by using `.bind`, which can bind
-a `this` context and arguments to function. It behaves identically to the code
-above
+Enfin, il est possible de mettre à contribution `.bind` pour arriver au
+même résultat, en liant `this` à un context et des arguments spécifiques.
 
     for(var i = 0; i < 10; i++) {
         setTimeout(console.log.bind(console, i), 1000);
